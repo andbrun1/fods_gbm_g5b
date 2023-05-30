@@ -119,10 +119,10 @@ correlation features?
 
 def split_data(X, y):
     #Split of the data in three sets, train 70%, test 15%, validation 15%
-    X_split, X_test, y_split, y_test = train_test_split(X,y,test_size=0.15, train_size=0.85, random_state=2023)
-    X_train, X_validate, y_train, y_validate = train_test_split(X_split,y_split,test_size=0.1765, train_size=0.8235, random_state=2023)
+    X_split, X_test, y_split, y_test = train_test_split(X,y,test_size=0.15, stratify=y, train_size=0.85, random_state=2023)
+    X_train, X_validate, y_train, y_validate = train_test_split(X_split,y_split,test_size=0.1765, stratify=y_split, train_size=0.8235, random_state=2023)
     
-    return X_train, X_validate, X_test, y_train, y_validate, y_test
+    return X_train, X_validate, X_test, y_train, y_validate, y_test, X_split, y_split
 
 def y_to_class(y, limit):
     #y is numerical, Survival from surgery days
