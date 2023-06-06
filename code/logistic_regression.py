@@ -5,6 +5,7 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import accuracy_score,recall_score, precision_score, f1_score, confusion_matrix, roc_curve, auc
 from sklearn.preprocessing import StandardScaler
 from sklearn.model_selection import StratifiedKFold
+import json
 
 from preprocessing import data_clin_c, data_rad_c
 from preprocessing import split_data, y_to_class
@@ -60,7 +61,7 @@ def evaluation_metrics(clf, y, X): #copied from HW5 and adapted
     # plt.show()
 
 
-    return [accuracy,precision,recall,specificity,f1, roc_auc, fp_rates, tp_rates]
+    return accuracy,precision,recall,specificity,f1, roc_auc, fp_rates, tp_rates
 
 survival_threshold = 456
 #456 is median survival rate for this cancer (see paper)
@@ -200,7 +201,7 @@ for i, width in enumerate(column_widths):
 plt.title("The 60 most relevant features")
 plt.tight_layout()
 plt.savefig('../output/best_60_features.pdf')
-#plt.show()
+plt.show()
 
 
 # select the best feature from datatab
@@ -225,14 +226,27 @@ fig,ax = plt.subplots(1,1,figsize=(6, 4))
 df_performance_log_reg = pd.DataFrame(columns = ['accuracy','precision','recall',
                                          'specificity','F1','roc_auc',"fp_rates", "tp_rates"])
 
-eval_metrics = evaluation_metrics(log_reg, y_test_final, X_test_std)
-df_performance_log_reg.loc[len(df_performance_log_reg),:] = eval_metrics
+accuracy, precision, recall, specificity, f1, roc_auc, fp_rates, tp_rates = evaluation_metrics(log_reg, y_test_final, X_test_std)
+#df_performance_log_reg.loc[len(df_performance_log_reg),:] = eval_metrics
 # print(metrics)
 # print(df_performance_log_reg)
 # comparison by eye: model with 60 features performs better than with all features :)
 
-evaluation_lr = ["LR"]
-evaluation_lr.extend(eval_metrics)
+evaluation_lr = {
+    "accuracy":accuracy,
+    "precision":precision,
+    "recall":recall, 
+    "specificity":specificity,
+    "f1":f1, 
+    "roc_auc":roc_auc, 
+    "fp_rates":fp_rates.tolist(),
+    "tp_rates":tp_rates.tolist()
+}
+with open("../output/evaluation_lr.json", "w+") as f:
+    f.write(json.dumps(evaluation_lr))
+
+#evaluation_lr = ["LR"]
+#evaluation_lr.extend(eval_metrics)
 # print(evaluation_lr)
 # evaluation_lr --> export for comparison with other models
 

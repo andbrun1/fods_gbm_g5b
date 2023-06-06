@@ -4,6 +4,7 @@ from preprocessing import split_data, y_to_class
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
+import json
 
 from sklearn.preprocessing import StandardScaler
 from sklearn.ensemble import RandomForestClassifier
@@ -250,9 +251,21 @@ plt.tight_layout()
 plt.savefig("../output/RandomForest_evaluation.pdf", bbox_inches='tight')
 plt.show()
 
+evaluation_rfc = {
+    "accuracy":accuracy,
+    "precision":precision,
+    "recall":recall, 
+    "specificity":specificity,
+    "f1":f1, 
+    "roc_auc":roc_auc, 
+    "fp_rates":fp_rates.tolist(),
+    "tp_rates":tp_rates.tolist()
+}
+with open("../output/evaluation_rfc.json", "w+") as f:
+    f.write(json.dumps(evaluation_rfc))
 
-evaluation_RFC = ['RFC', accuracy, precision, recall, specificity, f1, roc_auc, fp_rates, tp_rates]
-print(evaluation_RFC)
+#evaluation_RFC = ['RFC', accuracy, precision, recall, specificity, f1, roc_auc, fp_rates, tp_rates]
+#print(evaluation_RFC)
 print(table_values)
 
 

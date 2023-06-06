@@ -7,6 +7,7 @@ from sklearn.neighbors import KNeighborsClassifier
 from sklearn.metrics import accuracy_score
 from sklearn.metrics import roc_curve, confusion_matrix, auc
 from sklearn.decomposition import PCA
+import json
 
 import warnings
 warnings.filterwarnings("ignore")
@@ -177,7 +178,19 @@ knn.fit(X_split_sc, y_split)
 
 # evaluation
 accuracy,precision,recall,specificity,f1, roc_auc,fp_rates, tp_rates = evaluation_metrics(knn, y_test, X_test_sc)
-evaluation_knn = ['KNN',accuracy,precision,recall,specificity,f1, roc_auc,fp_rates, tp_rates]
+evaluation_knn = {
+    "accuracy":accuracy,
+    "precision":precision,
+    "recall":recall, 
+    "specificity":specificity,
+    "f1":f1, 
+    "roc_auc":roc_auc, 
+    "fp_rates":fp_rates.tolist(),
+    "tp_rates":tp_rates.tolist()
+}
+with open("../output/evaluation_knn.json", "w+") as f:
+    f.write(json.dumps(evaluation_knn))
+#evaluation_knn = ['KNN',accuracy,precision,recall,specificity,f1, roc_auc,fp_rates, tp_rates]
 #print(evaluation_knn)
 
 # evaluation and comparison models
@@ -189,6 +202,9 @@ data_tab.iloc[2,0] = round(recall, 4)
 data_tab.iloc[3,0] = round(specificity,4)
 data_tab.iloc[4,0] = round(f1,4)
 data_tab.iloc[5,0] = round(roc_auc,4)
+
+print(evaluation_knn)
+exit()
 
 fig, ax = plt.subplots()
 ax.axis('off')
@@ -215,8 +231,9 @@ plt.show()
 
 
 
-
-
+#Export CSV
+output = np.asarray(evaluation_knn)
+pd.DataFrame(output).to_csv("../output/evaluation_knn.csv")   
 
 
 
