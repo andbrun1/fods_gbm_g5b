@@ -15,7 +15,7 @@ from sklearn.metrics import roc_curve, auc
 from sklearn.metrics import confusion_matrix
 from preprocessing import data_clin_c, data_rad_c
 from preprocessing import split_data, y_to_class
-
+import json
 #General Variables
 #Grid search parameters for SVM
 grid_best_c = 1.438449888287663 #Set to reduce time cost according to grid search
@@ -93,14 +93,25 @@ df_performance = pd.DataFrame(columns = ['tp','fp','tn','fn','accuracy', 'precis
 df_performance.loc['SVM (train)',:] = eval_Performance(y_train, X_train_sc, clf_SVM, clf_name = 'SVM')
 df_performance.loc['SVM (test)',:] = eval_Performance(y_test, X_test_sc, clf_SVM, clf_name = 'SVM (test')
 print(df_performance)
-evaluation_svm=list(eval_Performance(y_test, X_test_sc, clf_SVM, clf_name = 'SVM (test'))
-evaluation_svm=evaluation_svm[4:12]
+#evaluation_svm=list(eval_Performance(y_test, X_test_sc, clf_SVM, clf_name = 'SVM (test'))
+_,_,_,_,accuracy, precision, recall, specificity, f1, roc_auc, fp_rates, tp_rates = eval_Performance(y_test, X_test_sc, clf_SVM, clf_name = 'SVM (test')
+evaluation_svm = {
+    "accuracy":accuracy,
+    "precision":precision,
+    "recall":recall, 
+    "specificity":specificity,
+    "f1":f1, 
+    "roc_auc":roc_auc, 
+    "fp_rates":fp_rates.tolist(),
+    "tp_rates":tp_rates.tolist()
+}
+with open("../output/evaluation_svm.json", "w+") as f:
+    f.write(json.dumps(evaluation_svm))
+#evaluation_svm=evaluation_svm[4:12]
+#evaluation_svm.insert(0,'SVM')
 #print(evaluation_svm)
 
 #Visualisation
-# Get the roc curve using a sklearn function
-y_test_predict_proba  = clf_SVM.predict_proba(X_test_sc)
-fp_rates, tp_rates, _ = roc_curve(y_test, y_test_predict_proba[:,1])
 
 # Plot of Roc curve
 fig, ax = plt.subplots(figsize=(9, 6))

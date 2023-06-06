@@ -7,7 +7,7 @@ from sklearn.neighbors import KNeighborsClassifier
 from sklearn.metrics import accuracy_score
 from sklearn.metrics import roc_curve, confusion_matrix, auc
 from sklearn.decomposition import PCA
-
+import json
 # import evaluation list from model files, format: ['model name',accuracy,precision,recall,specificity,f1, roc_auc,fp_rates, tp_rates]
 # problem -> code is working for each model but when more than one model problems!!!
 #from KNN_PCA import evaluation_knn
@@ -16,6 +16,7 @@ from sklearn.decomposition import PCA
 #from svm import evaluation_svm
 
 # hard coding solution
+"""
 evaluation_knn = ['KNN', 0.5735294117647058, 0.3888888888888889, 0.28, 0.7441860465116279, 0.32558139534883723, 0.5576744186046512, np.array([0.        , 0.        , 0.02325581, 0.06976744, 0.25581395,
        0.44186047, 0.58139535, 0.8372093 , 0.95348837, 1.        ]), np.array([0.  , 0.04, 0.08, 0.2 , 0.28, 0.44, 0.72, 0.88, 0.96, 1.  ])]
 evaluation_lr = ['LR', 0.6470588235294118, 0.5185185185185185, 0.56, 0.6976744186046512, 0.5384615384615384, 0.666046511627907, np.array([0.        , 0.        , 0.        , 0.09302326, 0.09302326,
@@ -49,6 +50,46 @@ evaluation_svm = ['SVM', 0.6323529411764706, 0.5, 0.2, 0.8837209302325582, 0.285
 
 
 """
+evaluation_knn = None
+evaluation_lr = None
+evaluation_rfc = None
+evaluation_svm = None
+
+with open("../output/evaluation_knn.json", "r") as f:
+    evaluation_knn = json.load(f)
+with open("../output/evaluation_lr.json", "r") as f:
+    evaluation_lr = json.load(f)
+with open("../output/evaluation_rfc.json", "r") as f:
+    evaluation_rfc = json.load(f)
+with open("../output/evaluation_svm.json", "r") as f:
+    evaluation_svm = json.load(f)
+
+
+"""
+evaluation_svm_array = [
+    evaluation_svm['accuracy'],
+    evaluation_svm['precision'],
+    evaluation_svm['recall'],
+    evaluation_svm['specificity'],
+    evaluation_svm['f1'],
+    evaluation_svm['roc_auc'],
+    evaluation_svm['fp_rates'],
+    evaluation_svm['tp_rates']]
+    """
+"""
+# Plot of Roc curve
+fig, ax = plt.subplots(figsize=(9, 6))
+ax.set_xlabel("False positive rate")
+ax.set_ylabel("True positive rate")
+plt.plot([0, 1], [0, 1], color="r", ls="--", label='random\nclassifier')
+ax.set_title("Roc curve")
+ax.grid(color='gray', alpha=0.3, linestyle=':', linewidth=1)
+ax.minorticks_on()
+plt.legend
+ax.plot(evaluation_rfc['fp_rates'], evaluation_rfc['tp_rates'], color="grey")
+plt.show()
+exit()
+
 # read csv with saved lists (important files for models have to run first!!
 evaluation_knn = pd.read_csv("../data/evaluation_knn.csv")
 evaluation_lr = pd.read_csv("../data/evaluation_lr.csv")
@@ -66,20 +107,25 @@ evaluation_knn = evaluation_knn.flatten()
 evaluation_lr = evaluation_lr.flatten()
 evaluation_RFC = evaluation_RFC.flatten()
 evaluation_svm = evaluation_svm.flatten()
-"""
+
 
 
 print(evaluation_knn)
 print(evaluation_lr)
 print(evaluation_RFC)
 print(evaluation_svm)
-
+"""
 # roc curve (all models in one plot for comparison)
-plt.plot(evaluation_knn[7],evaluation_knn[8],label = evaluation_knn[0])
+plt.plot(evaluation_knn["fp_rates"],evaluation_knn["tp_rates"],label = "KNN")
+plt.plot(evaluation_lr["fp_rates"],evaluation_lr["tp_rates"],label = "LR")
+plt.plot(evaluation_rfc["fp_rates"],evaluation_rfc["tp_rates"],label = "RFC")
+plt.plot(evaluation_svm["fp_rates"],evaluation_svm["tp_rates"],label = "SVM")
+"""
+plt.plot(evaluation_knn["fp_rates"],evaluation_knn[tp_rates],label = evaluation_knn[0])
 plt.plot(evaluation_lr[7],evaluation_lr[8],label = evaluation_lr[0])
-plt.plot(evaluation_RFC[7],evaluation_RFC[8],label = evaluation_RFC[0])
+plt.plot(evaluation_rfc[7],evaluation_rfc[8],label = evaluation_rfc[0])
 plt.plot(evaluation_svm[7],evaluation_svm[8],label = evaluation_svm[0])
-
+"""
 plt.xlabel('FPR')
 plt.ylabel('TPR')
 plt.plot([0, 1], [0, 1],'r--', label = 'random\nclassifier')
@@ -92,15 +138,15 @@ plt.savefig('../output/ROC_models.png')
 plt.show()
 
 # table with evaluation metrics for every model
-col_names = [evaluation_knn[0],evaluation_lr[0],evaluation_RFC[0],evaluation_svm[0]]
-#col_names = [evaluation_lr[0]]
-index = ["accuracy", "precision", "recall", "specificity", "F1", "roc_auc"]
-data_tab = pd.DataFrame(index=index, columns=col_names)
-for i in range(len(index)):
-    data_tab.iloc[i,0] = round(evaluation_knn[i+1],2)
-    data_tab.iloc[i,1] = round(evaluation_lr[i+1],2)
-    data_tab.iloc[i,2] = round(evaluation_RFC[i+1],2)
-    data_tab.iloc[i,3] = round(evaluation_svm[i+1],2)
+col_names = ["KNN","LR","RFC","SVM"]
+keys = ["accuracy", "precision", "recall", "specificity", "f1", "roc_auc"]
+data_tab = pd.DataFrame(index=keys, columns=col_names)
+for key in keys:
+    data_tab.loc[key,"KNN"] = round(evaluation_knn[key],2)
+    data_tab.loc[key,"LR"] = round(evaluation_lr[key],2)
+    data_tab.loc[key,"RFC"] = round(evaluation_rfc[key],2)
+    data_tab.loc[key,"SVM"] = round(evaluation_svm[key],2)
+print(data_tab)
 
 fig, ax = plt.subplots()
 ax.axis("tight")
