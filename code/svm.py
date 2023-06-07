@@ -1,11 +1,8 @@
 import pandas as pd
 import numpy as np
-import seaborn as sns
 import matplotlib.pyplot as plt
-from sklearn.linear_model import Lasso, LogisticRegression
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
-from sklearn.feature_selection import SelectFromModel
 from sklearn import svm
 from sklearn.svm import SVC
 from sklearn.model_selection import StratifiedKFold
@@ -13,18 +10,18 @@ from sklearn.model_selection import GridSearchCV
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
 from sklearn.metrics import roc_curve, auc
 from sklearn.metrics import confusion_matrix
-from preprocessing import data_clin_c, data_rad_c
+from preprocessing import data_rad_c
 from preprocessing import split_data, y_to_class
 import json
 #General Variables
 #Grid search parameters for SVM
 grid_best_c = 1.438449888287663 #Set to reduce time cost according to grid search
 grid_best_gamma = 0.004281332398719396 #Set to reduce time cost according to grid search
-grid_best_kernel = "rbf" #Set to reduce time cost according to grid search
+
 #Parameters to induce new computation
 #grid_best_c = None
 #grid_best_gamma = None 
-#grid_best_kernel = None
+
 
 X=data_rad_c[data_rad_c.columns.drop("Survival_from_surgery_days")]
 y=data_rad_c["Survival_from_surgery_days"]
@@ -42,24 +39,22 @@ X_test_sc = sc.transform(X_test)
 #Grid search
 #Only done if no best parameters are available
 #Done once and set in code at the beginning to reduce time cost
-if not grid_best_c or not grid_best_gamma or not grid_best_kernel:
-    kernels = ["poly", "rbf", "sigmoid"]
+if not grid_best_c or not grid_best_gamma:
     metrics = {'accuracy': [], 'precision': [], 'recall': [], 'f1': []}
     #search for Hyperparameters
     c_range = np.logspace(-3, 3, 20, base=10)
-    gamma_range = np.logspace(-3, 3, 20, base=10)
-    grid_params = dict(gamma=gamma_range, C=c_range, kernel=kernels)
+    gamma_range = np.logspace(0, 3, 20, base=10)
+    grid_params = dict(gamma=gamma_range, C=c_range)
     cv = StratifiedKFold(n_splits = 5, shuffle = True, random_state=2023)
     grid = GridSearchCV(SVC(), param_grid=grid_params, cv=cv, n_jobs=-1)
     grid.fit(X_train_sc, y_train)
     grid_best_c = grid.best_params_["C"]
     grid_best_gamma = grid.best_params_["gamma"]
-    grid_best_kernel = grid.best_params_["kernel"]
     
 #print("The best parameters are %s"% (f"C: {grid_best_c}, gamma: {grid_best_gamma}"))
 
 #Implement support vector machine with found parameters
-clf_SVM = svm.SVC(probability=True, kernel = grid_best_kernel, C=grid_best_c, gamma=grid_best_gamma)
+clf_SVM = svm.SVC(probability=True, kernel = "rbf", C=grid_best_c, gamma=grid_best_gamma)
 #Hyperparameters are C and gamma
 #high c -> close fitting to achieve best fit of training data, low c -> smoother, less overfitting, squared l2 penalty
 #gamma defines how much influence one example has, low reaches far, high reaches close
