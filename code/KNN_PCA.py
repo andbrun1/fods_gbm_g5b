@@ -204,7 +204,7 @@ data_tab.iloc[4,0] = round(f1,4)
 data_tab.iloc[5,0] = round(roc_auc,4)
 
 print(evaluation_knn)
-exit()
+
 
 fig, ax = plt.subplots()
 ax.axis('off')
@@ -231,9 +231,7 @@ plt.show()
 
 
 
-#Export CSV
-output = np.asarray(evaluation_knn)
-pd.DataFrame(output).to_csv("../output/evaluation_knn.csv")   
+
 
 
 
