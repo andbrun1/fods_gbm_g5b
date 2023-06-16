@@ -10,30 +10,30 @@ from sklearn.feature_selection import SelectFromModel
 
 # load the data
 data_clinical = pd.read_csv("../data/clinFeatures_UPENN.csv")
-data_radiation = pd.read_csv("../data/radFeatures_UPENN.csv")
+data_radiomic = pd.read_csv("../data/radFeatures_UPENN.csv")
 
 # look at data: -> !!!!!
-#print(data_radiation.shape)
+#print(data_radiomic.shape)
 
 # data types
 #print(data_clinical.dtypes)
-#print(data_radiation.dtypes)
-#print(data_radiation.dtypes.value_counts()) #only float and int (ID object)
+#print(data_radiomic.dtypes)
+#print(data_radiomic.dtypes.value_counts()) #only float and int (ID object)
 
 #check for duplicates -> !!!!
 #print(data_clinical.shape)
-#print(data_radiation.shape)
+#print(data_radiomic.shape)
 data_clinical = data_clinical.drop_duplicates()
-data_radiation = data_radiation.drop_duplicates()
+data_radiomic = data_radiomic.drop_duplicates()
 #print(data_clinical.shape)
-#print(data_radiation.shape)
+#print(data_radiomic.shape)
 # shape stays the same -> no dublicates
 
-#print(data_radiation['FLAIR_ED_Intensity_Energy'])
+#print(data_radiomic['FLAIR_ED_Intensity_Energy'])
 
 # set index SubjectID
 d1 = data_clinical.set_index('SubjectID', drop= True)
-d2 = data_radiation.set_index('SubjectID', drop= True)
+d2 = data_radiomic.set_index('SubjectID', drop= True)
 #print((d2.isna()).sum().sum())
 #print(d2.isna().sum())
 
