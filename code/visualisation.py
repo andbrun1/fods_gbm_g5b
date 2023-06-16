@@ -3,12 +3,12 @@ import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
 
-from preprocessing import data_clin_c, data_rad_c,d1, d2, data_clinical_days, data_clinical, data_radiation
+from preprocessing import data_clin_c, data_rad_c,d1, d2, data_clinical_days, data_clinical, data_radiomic
 from KNN_PCA import X,y,X_train, X_val, X_test, y_train, y_val, y_test
 
 # data before preprocessing
 #print(data_clinical.shape)
-#print(data_radiation.shape)
+#print(data_radiomic.shape)
 
 # data after preprocessing
 # data_clin_c
