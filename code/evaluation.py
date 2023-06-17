@@ -1,19 +1,8 @@
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
-from sklearn.model_selection import train_test_split, cross_val_score, StratifiedKFold, GridSearchCV
-from sklearn.preprocessing import StandardScaler
-from sklearn.neighbors import KNeighborsClassifier
-from sklearn.metrics import accuracy_score
-from sklearn.metrics import roc_curve, confusion_matrix, auc
-from sklearn.decomposition import PCA
 import json
 # import evaluation list from model files, format: ['model name',accuracy,precision,recall,specificity,f1, roc_auc,fp_rates, tp_rates]
-# problem -> code is working for each model but when more than one model problems!!!
-#from KNN_PCA import evaluation_knn
-#from logistic_regression import evaluation_lr
-#from Random_forest_classifier import evaluation_RFC
-#from svm import evaluation_svm
 
 # hard coding solution
 """

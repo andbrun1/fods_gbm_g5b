@@ -4,7 +4,7 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 
 from preprocessing import data_clin_c, data_rad_c,d1, d2, data_clinical_days, data_clinical, data_radiomic
-from KNN_PCA import X,y,X_train, X_val, X_test, y_train, y_val, y_test
+from KNN_PCA import X,y, y_train, y_val, y_test
 
 # data before preprocessing
 #print(data_clinical.shape)
@@ -122,6 +122,3 @@ ax.axis('tight')
 tab1 = ax.table(cellText=data_tab1.values,colLabels=data_tab1.columns, rowLabels=data_tab1.index, loc='center')
 tab1.set_fontsize(14)
 plt.savefig("../output/distribution_outcome_sets.pdf", bbox_inches='tight',pad_inches=0.2)
-
-
-

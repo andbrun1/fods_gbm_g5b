@@ -1,7 +1,7 @@
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
-from sklearn.model_selection import train_test_split, cross_val_score, StratifiedKFold, GridSearchCV
+from sklearn.model_selection import StratifiedKFold
 from sklearn.preprocessing import StandardScaler
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.metrics import accuracy_score
@@ -12,7 +12,7 @@ import json
 import warnings
 warnings.filterwarnings("ignore")
 
-from preprocessing import data_clin_c, data_rad_c,split_data, y_to_class
+from preprocessing import data_rad_c, split_data, y_to_class
 
 
 

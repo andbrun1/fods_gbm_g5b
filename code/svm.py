@@ -1,7 +1,6 @@
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
-from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
 from sklearn import svm
 from sklearn.svm import SVC
@@ -26,7 +25,7 @@ grid_best_gamma = 0.004281332398719396 #Set to reduce time cost according to gri
 X=data_rad_c[data_rad_c.columns.drop("Survival_from_surgery_days")]
 y=data_rad_c["Survival_from_surgery_days"]
 y_to_class(y, 456)
-#print(y.value_counts()) #Um Aufteilung zu sehen
+#print(y.value_counts()) #To see split
 
 #Test split, Validation and training set are retrieved in merged form
 _, _, X_test, _, _, y_test, X_train, y_train = split_data(X, y)
@@ -40,10 +39,9 @@ X_test_sc = sc.transform(X_test)
 #Only done if no best parameters are available
 #Done once and set in code at the beginning to reduce time cost
 if not grid_best_c or not grid_best_gamma:
-    metrics = {'accuracy': [], 'precision': [], 'recall': [], 'f1': []}
     #search for Hyperparameters
     c_range = np.logspace(-3, 3, 20, base=10)
-    gamma_range = np.logspace(0, 3, 20, base=10)
+    gamma_range = np.logspace(-3, 3, 20, base=10)
     grid_params = dict(gamma=gamma_range, C=c_range)
     cv = StratifiedKFold(n_splits = 5, shuffle = True, random_state=2023)
     grid = GridSearchCV(SVC(), param_grid=grid_params, cv=cv, n_jobs=-1)
@@ -51,7 +49,7 @@ if not grid_best_c or not grid_best_gamma:
     grid_best_c = grid.best_params_["C"]
     grid_best_gamma = grid.best_params_["gamma"]
     
-#print("The best parameters are %s"% (f"C: {grid_best_c}, gamma: {grid_best_gamma}"))
+print("The best parameters are %s"% (f"C: {grid_best_c}, gamma: {grid_best_gamma}"))
 
 #Implement support vector machine with found parameters
 clf_SVM = svm.SVC(probability=True, kernel = "rbf", C=grid_best_c, gamma=grid_best_gamma)
@@ -77,18 +75,14 @@ def eval_Performance(y_eval, X_eval, clf, clf_name = 'My Classifier'):
     recall    = recall_score(y_eval, y_pred)
     f1        = f1_score(y_eval, y_pred)
     fp_rates, tp_rates, _ = roc_curve(y_eval, y_pred_proba)
-    #if y_eval == y_test:
-        #evaluation_svm = ['SVM',accuracy,precision,recall,specificity,f1, roc_auc,fp_rates, tp_rates]
     # Calculate the area under the roc curve using a sklearn function
     roc_auc = auc(fp_rates, tp_rates)
-
     return tp,fp,tn,fn,accuracy, precision, recall, specificity, f1, roc_auc, fp_rates, tp_rates
 
 df_performance = pd.DataFrame(columns = ['tp','fp','tn','fn','accuracy', 'precision', 'recall', 'specificity', 'f1', 'roc_auc', 'fp_rates', 'tp_rates'] )
 df_performance.loc['SVM (train)',:] = eval_Performance(y_train, X_train_sc, clf_SVM, clf_name = 'SVM')
 df_performance.loc['SVM (test)',:] = eval_Performance(y_test, X_test_sc, clf_SVM, clf_name = 'SVM (test')
 print(df_performance)
-#evaluation_svm=list(eval_Performance(y_test, X_test_sc, clf_SVM, clf_name = 'SVM (test'))
 _,_,_,_,accuracy, precision, recall, specificity, f1, roc_auc, fp_rates, tp_rates = eval_Performance(y_test, X_test_sc, clf_SVM, clf_name = 'SVM (test')
 evaluation_svm = {
     "accuracy":accuracy,
@@ -102,12 +96,8 @@ evaluation_svm = {
 }
 with open("../output/evaluation_svm.json", "w+") as f:
     f.write(json.dumps(evaluation_svm))
-#evaluation_svm=evaluation_svm[4:12]
-#evaluation_svm.insert(0,'SVM')
-#print(evaluation_svm)
 
 #Visualisation
-
 # Plot of Roc curve
 fig, ax = plt.subplots(figsize=(9, 6))
 ax.set_xlabel("False positive rate")
@@ -119,4 +109,3 @@ ax.minorticks_on()
 plt.legend
 ax.plot(fp_rates, tp_rates, color="grey")
 plt.show()
-
