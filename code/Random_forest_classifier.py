@@ -1,4 +1,4 @@
-from preprocessing import data_clin_c, data_rad_c
+from preprocessing import data_rad_c
 from preprocessing import split_data, y_to_class
 
 import pandas as pd

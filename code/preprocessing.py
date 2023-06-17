@@ -1,18 +1,12 @@
 import pandas as pd
 import numpy as np
-import seaborn as sns
-import matplotlib.pyplot as plt
-from sklearn.linear_model import Lasso, LogisticRegression
 from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import StandardScaler
-from sklearn.feature_selection import SelectFromModel
-
 
 # load the data
 data_clinical = pd.read_csv("../data/clinFeatures_UPENN.csv")
 data_radiomic = pd.read_csv("../data/radFeatures_UPENN.csv")
 
-# look at data: -> !!!!!
+# look at data:
 #print(data_radiomic.shape)
 
 # data types
@@ -20,16 +14,14 @@ data_radiomic = pd.read_csv("../data/radFeatures_UPENN.csv")
 #print(data_radiomic.dtypes)
 #print(data_radiomic.dtypes.value_counts()) #only float and int (ID object)
 
-#check for duplicates -> !!!!
+#check for duplicates
 #print(data_clinical.shape)
 #print(data_radiomic.shape)
 data_clinical = data_clinical.drop_duplicates()
 data_radiomic = data_radiomic.drop_duplicates()
 #print(data_clinical.shape)
 #print(data_radiomic.shape)
-# shape stays the same -> no dublicates
-
-#print(data_radiomic['FLAIR_ED_Intensity_Energy'])
+# shape stays the same -> no duplicates
 
 # set index SubjectID
 d1 = data_clinical.set_index('SubjectID', drop= True)
@@ -54,12 +46,12 @@ data_clinical_days = data_clinical_days[data_clinical_days['Survival_from_surger
 #print((data_clinical_days.isna()).sum().sum())
 # new df: only with patients (rows) with an entry in 'Survival_from_surgery_days'
 #print(data_clinical_days['Survival_from_surgery_days'])
-#print(data_clinical_days.shape) #wie viele Patienten noch?
+#print(data_clinical_days.shape) #How many patients still available
 
 # overview features -> number of missing values for each feature
 missing_count = data_clinical_days.isna().sum()
 #print(missing_count)
-# number of features with 0 missing values
+#number of features with 0 missing values
 #print(missing_count.value_counts())
 #print((missing_count == 0).sum()) #result 577-1 = 576 (-1 because label (cleaned before) is a column in data_clinical_days)
 
@@ -67,7 +59,7 @@ missing_count = data_clinical_days.isna().sum()
 #missing_pat = data_clinical_days.dropna()
 #print(missing_pat.shape) #(312, 4753) 312 patients are complete
 #print(missing_pat)
-# -> don't drop patiente!!
+# -> don't drop patients
 
 # data_clinical
 #print((data_clinical.isna()).sum()) #no missing values appart from PsP_TP_score (611 missing values for PsP_TP_score)
@@ -80,7 +72,7 @@ data_rad_c = data_clinical_days.dropna(axis = 1)
 #print(data_rad_c.shape)
 
 # correlation between features -> drop features which correlate
-# plot difficult -> many possible combinations!
+# plot difficult -> many possible combinations, to big to be useful for explanation
 
 #data_rad_only = data_rad_c.drop('Survival_from_surgery_days', axis = 1)
 
@@ -97,7 +89,7 @@ data_rad_c = data_rad_c.drop(data_rad_c[to_drop],axis =1)
 #print(data_rad_c['Survival_from_surgery_days'])
 
 
-# for data_clinical drop columns with PsP_TP_score and drop all patients droped in data_clinical_days
+# for data_clinical drop columns with PsP_TP_score and drop all patients dropped in data_clinical_days
 data_clin_c = d1.drop('PsP_TP_score', axis=1)
 #print((data_clin_c.isna()).sum())
 data_clin_c = data_clin_c[data_clin_c.index.isin(data_rad_c.index)]
@@ -109,12 +101,8 @@ data_clin_c = data_clin_c[data_clin_c.index.isin(data_rad_c.index)]
 
 """
 Result of preprocessing:
-data_rad_c: shape (452,367), no NaN, label (Survival_from_surgery_days) column added, all incomplete features droped, no correlated features
+data_rad_c: shape (452,367), no NaN, label (Survival_from_surgery_days) column added, all incomplete features dropped, no correlated features
 data_clin_c: shape (452,8) same indices as in data_rad_c, no NaN
--> nur noch diese data sets verwenden!
-
-flow chart data preprocessing
-correlation features?
 """
 
 def split_data(X, y):

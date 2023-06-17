@@ -7,7 +7,7 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.model_selection import StratifiedKFold
 import json
 
-from preprocessing import data_clin_c, data_rad_c
+from preprocessing import data_rad_c
 from preprocessing import split_data, y_to_class
 
 def add_identity(axes, *line_args, **line_kwargs): #copied from HW5
