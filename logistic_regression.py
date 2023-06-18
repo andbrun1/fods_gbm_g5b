@@ -30,7 +30,7 @@ def evaluation_metrics(clf, y, X): #copied from HW5 and adapted
     """
 
     # Get the label predictions
-    y_test_pred = log_reg.predict(X) # X corresponds to X_test_sc
+    y_test_pred = log_reg.predict(X)
 
     tn, fp, fn, tp = confusion_matrix(y, y_test_pred).ravel()
 
@@ -38,14 +38,14 @@ def evaluation_metrics(clf, y, X): #copied from HW5 and adapted
     precision   = tp / (tp + fp)
     specificity = tn / (tn+fp)
     accuracy    = (tp +tn)/(tp +fp+tn+fn)
-    recall      = tp / (tp + fn)  #same as sensitivity
-    f1          = 2*((precision*recall)/(precision+recall)) #takes into account precision and recall
+    recall      = tp / (tp + fn)
+    f1          = 2*((precision*recall)/(precision+recall))
 
-    # Get the roc curve using a sklearn function
+    # Get the roc curve
     y_test_predict_proba  = clf.predict_proba(X)[:,1]
     fp_rates, tp_rates, _ = roc_curve(y, y_test_predict_proba)
 
-    # Calculate the area under the roc curve using a sklearn function
+    # Calculate the area under the roc curve
     roc_auc = auc(fp_rates, tp_rates)
 
     # Plot the roc curve
@@ -66,18 +66,18 @@ survival_threshold = 456
 #456 is median survival rate for this cancer (see paper)
 X = data_rad_c[data_rad_c.columns.drop("Survival_from_surgery_days")]
 y = data_rad_c["Survival_from_surgery_days"]
-y_to_class(y, survival_threshold) #ignore warning
+y_to_class(y, survival_threshold)
 # print(y.value_counts()) #to see distribution
 
 #Test split
 X_train_final, X_val_final, X_test_final, y_train_final, y_val_final, y_test_final, X_split, y_split = split_data(X, y)
 #I only need split (and test at the end); split is later divided into train and val several times
 #the final is added so one can differentiate from the data in the fold
-#print(y_test_final.shape)
 
 # Initialize a 5 fold cross-validator and model
 n_splits = 5
 cv = StratifiedKFold(n_splits=n_splits, shuffle=True, random_state=2023)
+
 # Initialize the model
 log_reg = LogisticRegression(penalty="none", random_state=2023)
 
@@ -92,7 +92,7 @@ for train_index, val_index in cv.split(X_split, y_split): # divide split into tr
     X_train = X_split.iloc[train_index]
     X_val = X_split.iloc[val_index]
     y_train = y_split.iloc[train_index]
-    y_val = y_split.iloc[val_index]   # use y or y_split? does it matter at all?
+    y_val = y_split.iloc[val_index]
 
     # Standardize the data  within the loop!
     scaler = StandardScaler()
@@ -100,7 +100,6 @@ for train_index, val_index in cv.split(X_split, y_split): # divide split into tr
     X_val_std = scaler.transform(X_val)
 
     # Train and predict
-    # print("y_train in loop", y_train.shape)
     log_reg.fit(X_train_std, y_train)
     y_pred = log_reg.predict(X_val_std)
 
@@ -127,57 +126,37 @@ for train_index, val_index in cv.split(X_split, y_split): # divide split into tr
         print('y_pred = 1|  ' + str(FN) + '\t\t\t|' + str(TN))
 """
 
-
-
-#print(metrics)
-#print(all_coefficients)
-
 #calculate the importance, then mean of that
 normcoef = pd.DataFrame(index = np.arange(n_splits), columns = X_train.columns)
-#print(normcoef)
-#print(len(X_train), len(X_split))
-for l in range(0, X_split.shape[1]): #samples are different in train and split, number of feat is the same
+for l in range(0, X_split.shape[1]): #samples are different in train and split, number of features is the same
     for i in range(0, n_splits):
-        normcoef.iloc[i,l] = np.asarray(all_coefficients.iloc[i,l]/np.sum(all_coefficients.iloc[i])).flatten() #understand i&l!
-#print(normcoef)
+        normcoef.iloc[i,l] = np.asarray(all_coefficients.iloc[i,l]/np.sum(all_coefficients.iloc[i])).flatten()
 
 #get the mean and std of the normalised coefficients and sort them
 mean_values = normcoef.mean()
 std_values = normcoef.std()
 datatab = pd.DataFrame({"mean": mean_values, "std": std_values})
-#print(datatab)
-#print(datatab.loc["T1GD_ED_Intensity_Energy"])
 datatab = datatab.sort_values("mean", ascending=False)
-#print(datatab)
 datatab_100 = datatab.iloc[:100]
-#print(datatab_100)
 
 #print the importance of the 100 best features
 fig, ax = plt.subplots(figsize=(12, 6))
 ax.bar(np.arange(100), datatab_100["mean"], yerr=datatab_100["std"])
-#ax.set_xticks(np.arange(100))
-#ax.set_xticklabels(datatab_100.index.tolist(), rotation=90)
 ax.set_title("Normalized importance of best 100 features", fontsize=20)
 ax.set_xlabel("Feature", fontsize=16)
 ax.set_ylabel("Coefficient (absolute)", fontsize=16)
-#plt.tight_layout()
 plt.savefig('../output/importance_100.png')
-#plt.show()
 
 #there is no clear ellbow. possible cut offs are after 14, 28 or 60...
 #print the importance of the 60 best features
 datatab_60 = datatab.iloc[:60]
 fig, ax = plt.subplots(figsize=(15, 6))
 ax.bar(np.arange(60), datatab_60["mean"], yerr=datatab_60["std"])
-#ax.set_xticks(np.arange(60))
-#ax.set_xticklabels(datatab_60.index.tolist(), rotation=50, fontsize=12)
 ax.set_title("Normalized importance of best 60 features", fontsize=20)
 ax.set_xlabel("Feature", fontsize=16)
 ax.set_ylabel("Coefficient (absolute)", fontsize=16)
 plt.tight_layout()
-#plt.subplots_adjust(bottom=0.8)
 plt.savefig('../output/importance_60.png')
-#plt.show()
 
 # create table with the x labels
 x_labels = np.arange(1,61)
@@ -200,7 +179,6 @@ for i, width in enumerate(column_widths):
 plt.title("The 60 most relevant features")
 plt.tight_layout()
 plt.savefig('../output/best_60_features.pdf')
-#plt.show()
 
 
 # select the best feature from datatab
@@ -211,7 +189,6 @@ best_feature_indexes = datatab.index[:cut_off]
 X_best_train = X_split.loc[:, best_feature_indexes]
 X_best_test = X_test_final.loc[:, best_feature_indexes]
 
-
 # Standardize the data
 X_train_std = scaler.fit_transform(X_best_train)
 X_test_std = scaler.transform(X_best_test)
@@ -220,22 +197,14 @@ X_test_std = scaler.transform(X_best_test)
 log_reg.fit(X_train_std, y_split)
 
 
-# roc curve from homework 5
+# roc curve
 fig,ax = plt.subplots(1,1,figsize=(6, 4))
 df_performance_log_reg = pd.DataFrame(columns = ['accuracy','precision','recall',
                                          'specificity','F1','roc_auc',"fp_rates", "tp_rates"])
 
 eval_metrics = evaluation_metrics(log_reg, y_test_final, X_test_std)
 df_performance_log_reg.loc[len(df_performance_log_reg),:] = eval_metrics
-# print(metrics)
-# print(df_performance_log_reg)
-# comparison by eye: model with 60 features performs better than with all features :)
 
 evaluation_lr = ["LR"]
 evaluation_lr.extend(eval_metrics)
-# print(evaluation_lr)
 # evaluation_lr --> export for comparison with other models
-
-# calculate importance (absolute values), order them, plot them, elbow plot style --> take most relevant
-# extract most important features, make new model only with those (with train & test), evaluate performance
-
