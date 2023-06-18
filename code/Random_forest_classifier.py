@@ -37,7 +37,7 @@ def get_confusion_matrix(y, y_pred):
     :rtype: four integers
     """
 
-    # true/false pos/neg. - this is a block of code that's needed
+    # true/false pos/neg.
     tp = 0
     fp = 0
     tn = 0
@@ -95,13 +95,10 @@ def evaluation_metrics(RFC, y_test, X_test_sc):
     print(y_test)
 
     # Calculate the confusion matrix given the predicted and true labels with your function
-    # only add the correct inputs here
     tn, fp, fn, tp = get_confusion_matrix(y_test, y_test_pred)
     print(tn, fp, fn, tp)
 
-    # Ensure that you get correct values - this code will divert to
-    # sklearn if your implementation fails - you can ignore the lines under
-    # this comment, no input needed.
+
     tn_sk, fp_sk, fn_sk, tp_sk = confusion_matrix(y_test, y_test_pred).ravel()
     if np.sum([np.abs(tp-tp_sk), np.abs(tn-tn_sk), np.abs(fp-fp_sk), np.abs(fn-fn_sk)]) > 0:
         print('OWN confusion matrix failed!!! Reverting to sklearn.')
@@ -137,7 +134,7 @@ def evaluation_metrics(RFC, y_test, X_test_sc):
 X = data_rad_c[data_rad_c.columns.drop("Survival_from_surgery_days")]
 y = data_rad_c["Survival_from_surgery_days"]
 y_to_class(y, 456)
-print(y.value_counts()) #Um Aufteilung zu sehen
+print(y.value_counts()) # to see the distribution
 
 #Test split
 X_train, X_val, X_test, y_train, y_val, y_test, X_split, y_split = split_data(X, y)
@@ -151,17 +148,14 @@ number_trees = list(range(60, 130))
 best_accuracy = 0
 best_n = None
 acc = []
-#plt.figure()
 
 
-# Prepare the performance overview data frame - keep this
+# Prepare the performance overview data frame
 df_performance = pd.DataFrame(columns = ['fold','RFC','accuracy','precision','recall', 'specificity','F1','roc_auc'])
 df_LR_normcoef = pd.DataFrame(index = X.columns, columns = np.arange(n_splits))
 
 
-# Standardize the data: --> 1 mal pro fold Standardisieren
-# Use this counter to save your performance metrics for each crossvalidation fold
-# also plot the roc curve for each model and fold into a joint subplot
+# Standardize the data: --> 1 time per fold standardization
 fold = 0
 fig, axs = plt.subplots(1, 2, figsize=(9, 4))
 
@@ -226,13 +220,13 @@ RFC = RandomForestClassifier(n_estimators=83, max_depth=5, random_state=42)
 RFC.fit(X_split_sc, y_split)
 
 # Summarize the performance metrics over all folds
-#split the data frame so you have the performance for LR and RF
+# split the data frame so you have the performance for LR and RF
 df_performance_LR = df_performance.loc[df_performance["RFC"]=="LR"]
 df_performance_RF = df_performance.loc[df_performance["RFC"]=="RF"]
 print(df_performance_LR)
 print(df_performance_RF)
 
-#create an empty dataframe (called datatab) to be filled with mean and std of the performance metrics
+# create an empty dataframe (called datatab) to be filled with mean and std of the performance metrics
 accuracy, precision, recall, specificity, f1, roc_auc, fp_rates, tp_rates = evaluation_metrics(RFC, y_test, X_test_sc)
 
 metric_names = ["accuracy", "precision", "recall", "specificity", "F1", "roc_auc"]
@@ -264,8 +258,7 @@ evaluation_rfc = {
 with open("../output/evaluation_rfc.json", "w+") as f:
     f.write(json.dumps(evaluation_rfc))
 
-#evaluation_RFC = ['RFC', accuracy, precision, recall, specificity, f1, roc_auc, fp_rates, tp_rates]
-#print(evaluation_RFC)
+
 print(table_values)
 
 
