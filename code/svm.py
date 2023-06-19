@@ -108,4 +108,5 @@ ax.grid(color='gray', alpha=0.3, linestyle=':', linewidth=1)
 ax.minorticks_on()
 plt.legend
 ax.plot(fp_rates, tp_rates, color="grey")
+plt.savefig('../output/roc_curve_svm.png')
 plt.show()

@@ -3,8 +3,12 @@ import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
 
-from preprocessing import data_clin_c, data_rad_c,d1, d2, data_clinical_days, data_clinical, data_radiomic
-from KNN_PCA import X,y, y_train, y_val, y_test
+from preprocessing import data_clin_c, data_rad_c,d1, d2, data_clinical_days, data_clinical, data_radiomic, y_to_class, split_data
+
+X=data_rad_c[data_rad_c.columns.drop("Survival_from_surgery_days")]
+y=data_rad_c["Survival_from_surgery_days"]
+y_to_class(y, 456)
+_, _, _, y_train, y_val, y_test, _, _ = split_data(X, y)
 
 # data before preprocessing
 #print(data_clinical.shape)
